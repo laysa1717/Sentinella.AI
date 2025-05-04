@@ -1,11 +1,14 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+from app.services.textBlob_service import TextBlobService
 
-health_bp = Blueprint('health', __name__)
+sentiment_bp = Blueprint('sentiment', __name__)
 
-@health_bp.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        "message": "Health check successful",
-        'status': 'success',
-        "code": 200
-        }), 200
+@sentiment_bp.route('/sentiment', methods=['POST'])
+def sentiment():
+    body = request.get_json()
+    message = body['message']
+    
+    if not message:
+        return jsonify({'message': 'Message is required'}), 404
+    
+    return TextBlobService().get_sentiment(message)
